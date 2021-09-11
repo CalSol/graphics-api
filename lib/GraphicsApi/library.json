@@ -1,0 +1,11 @@
+{
+  "owner": "CalSol",
+  "name": "graphics-api",
+  "description": "Graphics API and UI Widgeting layer supporting multiple classes of pixel displays (OLED, LCD, mono, color)",
+  "frameworks": ["mbed"],
+  "version": "0.0.0",
+  "build": {
+    "includeDir": ".",
+    "srcDir": "."
+  }
+}
