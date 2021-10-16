@@ -11,7 +11,7 @@ void St7735s::init(uint8_t width, uint8_t height, uint8_t start_x, uint8_t start
   reset_ = 0;
   wait_us(10);  // reset pulse
   reset_ = 1;
-  wait_ms(120);  // wait for LCD to reset
+  wait_us(120*1000);  // wait for LCD to reset
 
   cmd(Cmd::SLPOUT, 0, {});
 
