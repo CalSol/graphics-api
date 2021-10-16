@@ -420,6 +420,10 @@ public:
     widget_->setValue(value);
   }
 
+  void setValueStale(T value) {
+    widget_->setValue(value);
+  }
+
   void fresh() {
     timer_.reset();
     widget_->setContrast(freshContrast_);
@@ -455,6 +459,10 @@ public:
     staleContainer_.setValue(value);
   }
 
+  void setValueStale(const char* value) {
+    staleContainer_.setValueStale(value);
+  }
+
   Size layout() {
     return staleContainer_.layout();
   }
@@ -487,6 +495,10 @@ public:
 
   void setValue(int32_t value) {
     staleContainer_.setValue(value);
+  }
+
+  void setValueStale(int32_t value) {
+    staleContainer_.setValueStale(value);
   }
 
   Size layout() {
