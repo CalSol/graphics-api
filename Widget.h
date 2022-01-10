@@ -215,6 +215,10 @@ public:
     contents_->draw(gfx, x + 2, y +font_.getFontHeight() + 1);
   }
 
+  void setContrast(uint8_t contrast) {
+    contrast_ = contrast;
+  }
+
 protected:
   Widget* const contents_;
   const char* title_;
