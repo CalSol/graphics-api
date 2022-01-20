@@ -20,9 +20,7 @@ protected:
     rs_ = 0;  // 0 for command data, 1 for display data
     spi_.write(command);
     rs_ = 1;
-    for (size_t i=0; i<data_len; i++) {
-      spi_.write(data[i]);
-    }
+    spi_.write((char*)data, data_len, NULL, 0);
 
     cs_ = 1;
   }

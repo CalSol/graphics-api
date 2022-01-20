@@ -45,6 +45,10 @@ public:
     }
   }
 
+   void clear() {  // optimized clear that understands the framebuffer format
+    memset(framebuffer_, 0, sizeof(framebuffer_));
+  }
+
 protected:
     uint8_t framebuffer_[width * height * 3 / 2];  // in display memory order, word=(RGB 444), x (row), y (col)
 };
