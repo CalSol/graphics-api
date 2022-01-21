@@ -78,8 +78,16 @@ public:
 
   void setValue(int32_t value) {
     // TODO rounding
-    itoa(value / fractional_, digitsBuf_, 10, maxDigits_);
-    text_.setValue(digitsBuf_);
+    if (value < 0) {
+      // handle the edge case where the value is negative but small enough that it's all fractional,
+      // the negative sign gets dropped because there is no negative zero
+      digitsBuf_[0] = '-';
+      itoa(abs(value / fractional_), digitsBuf_ + 1, 10, maxDigits_ - 1);
+      text_.setValue(digitsBuf_);
+    } else {
+      itoa(value / fractional_, digitsBuf_, 10, maxDigits_);
+      text_.setValue(digitsBuf_);
+    }
 
     if (fractionalDigits_ > 0) {
       uint64_t fractionalValue;
