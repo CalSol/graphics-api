@@ -34,6 +34,10 @@ public:
   void drawPixel(uint16_t x, uint16_t y, uint8_t contrast) {
     uint8_t contrast4 = contrast >> 4;
 
+    if (x >= width || y >= height) {
+      return;
+    }
+
     if (x % 2 == 0) {
       framebuffer_[(y * width * 3 / 2)+(x * 3 / 2)] = contrast4 | (contrast4 << 4);
       framebuffer_[(y * width * 3 / 2)+(x * 3 / 2) + 1] &= 0xf0;
@@ -45,7 +49,7 @@ public:
     }
   }
 
-   void clear() {  // optimized clear that understands the framebuffer format
+  void clear() {  // optimized clear that understands the framebuffer format
     memset(framebuffer_, 0, sizeof(framebuffer_));
   }
 
