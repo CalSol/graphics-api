@@ -1,3 +1,6 @@
+#ifndef __WIDGET_H__
+#define __WIDGET_H__
+
 #include "DefaultFonts.h"
 #include "mbed.h"
 
@@ -33,11 +36,18 @@ public:
   }
 
   Size layout() {
-    uint8_t realMaxLength = strlen(value_);
-    if (maxLength_ > realMaxLength) {
-      realMaxLength = maxLength_;
+    uint16_t maxLengthWidth = font_.getCharWidth('8') * maxLength_ + maxLength_;
+    if (maxLengthWidth > 0) {  // remove trailing space
+      maxLengthWidth -= 1;
     }
-    size_ = Size(font_.getCharWidth('8') * realMaxLength + realMaxLength - 1, font_.getFontHeight());  // TODO don't assume 1 px space
+    uint16_t realWidth = 0;
+    for (const char* valuePtr = value_; *valuePtr != 0; valuePtr++) {
+      realWidth += font_.getCharWidth(*valuePtr) + 1;
+    }
+    if (realWidth > 0) {  // remove trailing space
+      realWidth -= 1;
+    }
+    size_ = Size(std::max(maxLengthWidth, realWidth), font_.getFontHeight());
     return size_;
   }
 
@@ -133,8 +143,7 @@ public:
     }
   }
 
-protected:
-  void itoa(int32_t val, char* out, uint8_t base, size_t padLength = 0, char padChar = ' ') {
+  static void itoa(int32_t val, char* out, uint8_t base, size_t padLength = 0, char padChar = ' ') {
     char buf[32];  // TODO could be shorter
 
     bool isNeg = val < 0;
@@ -176,6 +185,7 @@ protected:
     *out = '\0';
   }
 
+protected:
   const uint8_t maxDigits_, fractionalDigits_;
   int32_t fractional_;
   uint8_t contrast_;
@@ -240,30 +250,35 @@ protected:
 template <size_t N>
 class HGridWidget: public Widget {
 public:
-  HGridWidget(Widget* contents[], uint16_t space = 1) :
-      space_(space) {
+  HGridWidget(Widget* contents[], uint16_t space = 1, bool bottomAlign = false) :
+      space_(space), bottomAlign_(bottomAlign) {
     for (size_t i=0; i < N; i++) {
       contents_[i] = contents[i];
     }
   }
 
   Size layout() {
-    uint16_t maxHeight = 0, widthSum = 0;
+    maxHeight_ = 0;
+    uint16_t widthSum = 0;
     for (size_t i=0; i<N; i++) {
       innerSize_[i] = contents_[i]->layout();
-      if (innerSize_[i].height > maxHeight) {
-        maxHeight = innerSize_[i].height;
+      if (innerSize_[i].height > maxHeight_) {
+        maxHeight_ = innerSize_[i].height;
       }
       widthSum += innerSize_[i].width;
     }
     widthSum += space_ * (N - 1);
-    return Size(widthSum, maxHeight);
+    return Size(widthSum, maxHeight_);
   }
 
   void draw(GraphicsApi& gfx, uint16_t x, uint16_t y) {
     uint16_t currX = x;
     for (size_t i=0; i<N; i++) {
-      contents_[i]->draw(gfx, currX, y);
+      uint16_t yPos = y;
+      if (bottomAlign_) {
+        yPos = y + maxHeight_ - innerSize_[i].height;
+      }
+      contents_[i]->draw(gfx, currX, yPos);
       currX += innerSize_[i].width + space_;
     }
   }
@@ -271,8 +286,10 @@ public:
 protected:
   Widget* contents_[N];
   const uint16_t space_;
+  const bool bottomAlign_;
 
   Size innerSize_[N];
+  uint16_t maxHeight_ = 0;  // valid after first layout()
 };
 
 
@@ -525,3 +542,5 @@ protected:
   NumericTextWidget textWidget_;
   StaleContainerWidget<int32_t> staleContainer_;
 };
+
+#endif
